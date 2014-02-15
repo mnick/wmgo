@@ -49,3 +49,11 @@ wmgo requires the following programms
   for antialiased fonts etc.)
 * [wmctrl](http://tomas.styblo.name/wmctrl/)
 * bash
+
+### Example for Awesome WM
+First, add keybindings in `rc.lua` to launch wmgo, e.g.
+```lua
+awful.key({ modkey }, ",", function() exec("/usr/bin/wmgo", false) end)
+```
+Next, reload your configuration. Now, you can switch between opened windows
+or launch new applications via `Mod4 + ,` and starting to type.
