@@ -1,8 +1,8 @@
 # wmgo
 wmgo is a dmenu-based launcher for EWMH compatible window 
-managers (e.g. awesome wm, XMonad, OpenBox, i3, ...).
-wmgo offers two main features:
+managers like awesome wm, XMonad, OpenBox, or i3.
 
+wmgo offers two main features:
 * Switching to currently opened windows via matching
   the window's title
 * Executing desktop files or binaries in $PATH via
