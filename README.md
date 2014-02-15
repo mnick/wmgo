@@ -48,7 +48,7 @@ wmgo requires the following programms
   (optional [dmenu with Xft support](http://tools.suckless.org/dmenu/patches/xft)
   for antialiased fonts etc.)
 * [wmctrl](http://tomas.styblo.name/wmctrl/)
-* bash
+* [bash](http://www.gnu.org/software/bash/)
 
 ### Example for Awesome WM
 First, add keybindings in `rc.lua` to launch wmgo, e.g.
