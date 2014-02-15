@@ -1,5 +1,5 @@
 #!/bin/bash
-# wmgo - EWMH winow manager launcher
+# wmgo - EWMH window manager launcher
 # based on Dmenu Launcher by Scott Garret
 
 # We need a display
@@ -108,7 +108,7 @@ if [[ ! -f "${cache}-menu" ]]; then
         apps=`cat "${cache}-menu"`
     fi
 wins="$(get-open-windows)" 
-cmd=$(echo -e "$wins"\n"$apps" | $dm -fn "Liberation Mono-9" -p "!")
+cmd=$(echo -e "$wins"\n"$apps" | $dm -fn "Liberation Mono-7" -p "!")
 
 # If nothing is selected -- exit
 [[ -z $cmd ]] && exit
