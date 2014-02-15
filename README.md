@@ -19,7 +19,7 @@ Pressing enter will either switch to the opened
 window or start the application.
 
 Obligatory screenshot after typing `mn`
-![Screenshot](http://i.imgur.com/5t5W1DT.png)
+![Screenshot](http://i.imgur.com/ZruYtmT.png)
 
 ### Dependencies
 wmgo requires the following programms
