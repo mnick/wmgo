@@ -1,7 +1,7 @@
 # Maintainer: Max Nickel <max.nickel@gmail.com>
 
 pkgname=wmgo-git
-pkgver=0.0.0
+pkgver=9c4d530
 pkgrel=1
 pkgdesc="A dmenu-based app launcher for EWMH compatible window managers (awesome wm, openbox, etc.)."
 url="https://github.com/mnick/wmgo"
