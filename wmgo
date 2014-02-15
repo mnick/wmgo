@@ -95,7 +95,6 @@ cmd-exists () {
 }
 
 launch () {
-	echo -e "Launching $@"
 	# Shouldn't be set when there won't be a terminal attached anymore...
     export TERM='dumb'
     # ...and won't be interactive...
@@ -118,9 +117,9 @@ else
 fi
 wins="$(get-open-windows)"
 if [ -z $FONT ]; then
-	cmd=$(echo -e "$wins"\n"$apps" | $dm -p "!")
+	cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
 else 
-	cmd=$(echo -e "$wins"\n"$apps" | $dm -fn "$FONT" -p "!")
+	cmd=$(echo -e "$wins\n$apps" | $dm -fn "$FONT" -p "!")
 fi
 
 # If nothing is selected -- exit
