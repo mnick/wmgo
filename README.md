@@ -12,7 +12,7 @@ XDG desktop files and binaries are cached for fast
 startup times of the launcher.
 
 ### Obligatory Screenshot
-(http://i.imgur.com/5t5W1DT.png)
+![Screenshot](http://i.imgur.com/5t5W1DT.png)
 
 ### Dependencies
 wmgo requires the following programms
