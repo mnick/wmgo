@@ -27,6 +27,7 @@ the shell variables
 * `$FONT` to set the font of dmenu
 * `$DMENU_OPTIONS` to set the remaining dmenu parameters
    (foreground color, background color, etc.)
+
 For instance,
 ```bash
 FONT="Liberation Mono-8" DMENU_OPTIONS="-b" wmgo
