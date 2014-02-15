@@ -1,5 +1,5 @@
 #!/bin/bash
-# wmgo - EWMH window manager launcher
+# wmgo - Launcher for EWMH window managers
 # based on Dmenu Launcher by Scott Garret
 
 # We need a display
@@ -18,10 +18,18 @@ xdg_paths=(
 cache="$HOME/.cache/wmgo.cache"
 
 # Path to history file.
-hist="$HOME/.config/wmgo/history"
+hist="$HOME/.cache/wmgo.history"
+
+# Path to config
+conf="$HOME/.config/wmgo/config"
+
+# Source config file if exists
+if [ -f $conf ]; then
+	source $conf
+fi
 
 # Dmenu command.
-dm="dmenu -b -i $DMENU_OPTIONS"
+dm="dmenu -i $DMENU_OPTIONS"
 
 # Choose proper LSX binary.
 if which 'lsx-suckless' &> /dev/null; then
@@ -49,7 +57,8 @@ function get-applications {
                    $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
                    END { print name "|" exec }' "$file" 2> /dev/null
     done > "$cache"
-    # Start printing out the menu items, starting with XDG shortcut names...
+    # Start printing out the menu items, starting with XDG 
+	# shortcut names...
     sed 's/|.*$//' "$cache" | sort -u
     # ...then, the binary names...
     (IFS=':'; $lsx $PATH | sort -u)
@@ -101,14 +110,18 @@ launch () {
 # Cache menu in background
 cache-menu &
 
-# If cache exists use cache, else build
+# If cache exists use cache, else build cache
 if [[ ! -f "${cache}-menu" ]]; then
-		apps="$(get-applications)"
-	else
-        apps=`cat "${cache}-menu"`
-    fi
-wins="$(get-open-windows)" 
-cmd=$(echo -e "$wins"\n"$apps" | $dm -fn "Liberation Mono-7" -p "!")
+	apps="$(get-applications)"
+else
+    apps=`cat "${cache}-menu"`
+fi
+wins="$(get-open-windows)"
+if [ -z $FONT ]; then
+	cmd=$(echo -e "$wins"\n"$apps" | $dm -p "!")
+else 
+	cmd=$(echo -e "$wins"\n"$apps" | $dm -fn "$FONT" -p "!")
+fi
 
 # If nothing is selected -- exit
 [[ -z $cmd ]] && exit
