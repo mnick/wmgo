@@ -28,6 +28,11 @@ if [ -f $conf ]; then
 	source $conf
 fi
 
+# Set terminal if unset
+if [[ -z "$TERMCMD" ]]; then
+	TERMCMD="xterm -e"
+fi
+
 # Dmenu command.
 dm="dmenu -i $DMENU_OPTIONS"
 
@@ -95,16 +100,17 @@ cmd-exists () {
 }
 
 launch () {
-	# Shouldn't be set when there won't be a terminal attached anymore...
-    export TERM='dumb'
-    # ...and won't be interactive...
-    unset PS1
-    "$@" </dev/null &>/dev/null & disown
+	if [[ $1 == "1" ]]; then
+		echo "YAY: ${@:2}"
+		$TERMCMD "${@:2} && echo 'Press any key to close...' && read"
+	else
+		# Shouldn't be set when there won't be a terminal attached anymore...
+    	# ...and won't be interactive...
+    	export TERM='dumb'
+    	unset PS1
+    	"${@:2}" </dev/null &>/dev/null & disown
+	fi
 }
-
-
-# Launch processes in background, detached and disowned from shell.
-[[ "$term_mode" ]] && flag_detach='no' || flag_detach='yes'
 
 # Cache menu in background
 cache-menu &
@@ -116,7 +122,7 @@ else
     apps=`cat "${cache}-menu"`
 fi
 wins="$(get-open-windows)"
-if [ -z $FONT ]; then
+if [[ -z "$FONT" ]]; then
 	cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
 else 
 	cmd=$(echo -e "$wins\n$apps" | $dm -fn "$FONT" -p "!")
@@ -129,6 +135,12 @@ if [[ $wins == *$cmd* ]]; then
 	raise-window "$cmd" && exit
 fi
 
+interm=0
+if [[ "${cmd: -1}" == ";" ]]; then
+	cmd="${cmd%?}"
+	interm=1
+fi
+
 # If the selection doesn't exist, see if it's an XDG shortcut.
 if ! cmd-exists $cmd; then
 	cmd=$(grep -F "$cmd|" "$cache" | sed 's/.*|//;s/ %.//g')
@@ -139,5 +151,5 @@ if ! cmd-exists $cmd; then
 fi
 
 if cmd-exists $cmd; then
-	launch $cmd
+	launch $interm $cmd
 fi
