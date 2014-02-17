@@ -7,6 +7,8 @@ wmgo offers two main features:
   the window's title
 * Executing desktop files or binaries in $PATH via
   matching the filename
+* Optionally, executing shell commands in newly 
+  launched terminal windows to capture the output
 
 XDG desktop files and binaries are cached for fast 
 startup times of the launcher.
@@ -30,7 +32,7 @@ The appearance of wmgo can be customized via
 the shell variables 
 * `$FONT` to set the font of dmenu
 * `$DMENU_OPTIONS` to set the remaining dmenu parameters
-   (foreground color, background color, etc.)
+   (foreground and background color, etc.)
 * `$TERMCMD` to set the terminal in which terminal commands
    should by executed via the `;` modifier
 
