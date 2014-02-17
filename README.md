@@ -1,14 +1,17 @@
 # wmgo
 wmgo is a dmenu-based launcher for EWMH compatible window 
-managers like awesome wm, XMonad, OpenBox, or i3.
+managers like [awesome wm](http://awesome.naquadah.org/), 
+[XMonad](http://xmonad.org/), [OpenBox](http://openbox.org/), 
+or [i3](http://i3wm.org/).
 
-wmgo offers two main features:
+### Features
+wmgo's main features:
 * Switching to currently opened windows via matching
   the window's title
 * Executing desktop files or binaries in $PATH via
   matching the filename
-* Optionally, executing shell commands in newly 
-  launched terminal windows to capture the output
+* Optionally, executing commands in new terminal 
+  windows to capture the output
 
 XDG desktop files and binaries are cached for fast 
 startup times of the launcher.
