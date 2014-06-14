@@ -7,21 +7,31 @@
 #    exit 1
 #fi
 
-# Path to XDG shortcut (*.desktop) directories.
-xdg_paths=(
-    /usr/share/applications
-    /usr/local/share/applications
-    ~/.local/share/applications
-)
+# XDG standard paths.
+if [ '!' -d "$XDG_CACHE_HOME" ]; then
+	XDG_CACHE_HOME="$HOME/.cache"
+fi
+
+if [ '!' -d "$XDG_CONFIG_HOME" ]; then
+	XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+if [ '!' -d "$XDG_DATA_HOME" ]; then
+	XDG_DATA_HOME="$HOME/.local/share"
+fi
+
+if [ -z "$XDG_DATA_DIRS" ]; then
+	XDG_DATA_DIRS="/usr/share:/usr/local/share"
+fi
 
 # Path to Dmenu Launcher cache will be stored.
-cache="$HOME/.cache/wmgo.cache"
+cache="$XDG_CACHE_HOME/wmgo.cache"
 
 # Path to history file.
-hist="$HOME/.cache/wmgo.history"
+hist="$XDG_CACHE_HOME/wmgo.history"
 
 # Path to config
-conf="$HOME/.config/wmgo/config"
+conf="$XDG_CONFIG_HOME/wmgo/config"
 
 # Source config file if exists
 if [ -f $conf ]; then
@@ -55,12 +65,15 @@ function get-applications {
     # Create cache directory if it doesn't exist.
     mkdir -p "${cache%/*}"
     # Cache names and executable paths of XDG shortcuts.
-    for file in $(printf '%s/*.desktop\n' "${xdg_paths[@]}"); do
-        # Grab the friendly name and path of the executable.
-        # (Thanks, <geirha@freenode/#awk>.)
-        awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
-                   $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
-                   END { print name "|" exec }' "$file" 2> /dev/null
+    xdg_paths=$(echo "$XDG_DATA_DIRS:$XDG_DATA_HOME" | sed 's/:/ /g')
+    for path in $xdg_paths; do
+        for file in $(printf '%s/applications/*.desktop\n' "$path"); do
+            # Grab the friendly name and path of the executable.
+            # (Thanks, <geirha@freenode/#awk>.)
+            awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
+                       $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
+                       END { print name "|" exec }' "$file" 2> /dev/null
+        done
     done > "$cache"
     # Start printing out the menu items, starting with XDG 
 	# shortcut names...
