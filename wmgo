@@ -53,6 +53,13 @@ else
     lsx=lsx
 fi
 
+# Use gtk-launch for desktop files, if present.
+if which 'gtk-launch' &> /dev/null; then
+    gtklaunch=gtk-launch
+else
+    unset gtklaunch
+fi
+
 function get-open-windows {
 	wmctrl -l | cut -d' ' -f5-
 }
@@ -68,11 +75,18 @@ function get-applications {
     xdg_paths=$(echo "$XDG_DATA_DIRS:$XDG_DATA_HOME" | sed 's/:/ /g')
     for path in $xdg_paths; do
         for file in $(printf '%s/applications/*.desktop\n' "$path"); do
-            # Grab the friendly name and path of the executable.
-            # (Thanks, <geirha@freenode/#awk>.)
-            awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
-                       $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
-                       END { print name "|" exec }' "$file" 2> /dev/null
+            if [ -f "$file" ]; then
+                # Grab the friendly name and path of the executable.
+                # (Thanks, <geirha@freenode/#awk>.)
+                if [ -z "$gtklaunch" ]; then
+                    awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
+                               $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
+                               END { print name "|" exec }' "$file" 2> /dev/null
+                else
+                    name=$(egrep ^Name= "$file" | head -n 1 | cut -d= -f2)
+                    echo "$name|$gtklaunch $(basename $file)"
+                fi
+            fi
         done
     done > "$cache"
     # Start printing out the menu items, starting with XDG 
