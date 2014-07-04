@@ -45,6 +45,9 @@ fi
 
 # Dmenu command.
 dm="dmenu -i $DMENU_OPTIONS"
+if [ -n "$FONT" ]; then
+    dm="$dm -fn \"$FONT\""
+fi
 
 # Choose proper LSX binary.
 if which 'lsx-suckless' &> /dev/null; then
@@ -149,11 +152,7 @@ else
     apps=`cat "${cache}-menu"`
 fi
 wins="$(get-open-windows)"
-if [[ -z "$FONT" ]]; then
-	cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
-else 
-	cmd=$(echo -e "$wins\n$apps" | $dm -fn "$FONT" -p "!")
-fi
+cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
 
 # If nothing is selected -- exit
 [[ -z $cmd ]] && exit
