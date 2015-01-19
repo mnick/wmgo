@@ -7,21 +7,31 @@
 #    exit 1
 #fi
 
-# Path to XDG shortcut (*.desktop) directories.
-xdg_paths=(
-    /usr/share/applications
-    /usr/local/share/applications
-    ~/.local/share/applications
-)
+# XDG standard paths.
+if [ '!' -d "$XDG_CACHE_HOME" ]; then
+	XDG_CACHE_HOME="$HOME/.cache"
+fi
+
+if [ '!' -d "$XDG_CONFIG_HOME" ]; then
+	XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+if [ '!' -d "$XDG_DATA_HOME" ]; then
+	XDG_DATA_HOME="$HOME/.local/share"
+fi
+
+if [ -z "$XDG_DATA_DIRS" ]; then
+	XDG_DATA_DIRS="/usr/share:/usr/local/share"
+fi
 
 # Path to Dmenu Launcher cache will be stored.
-cache="$HOME/.cache/wmgo.cache"
+cache="$XDG_CACHE_HOME/wmgo.cache"
 
 # Path to history file.
-hist="$HOME/.cache/wmgo.history"
+hist="$XDG_CACHE_HOME/wmgo.history"
 
 # Path to config
-conf="$HOME/.config/wmgo/config"
+conf="$XDG_CONFIG_HOME/wmgo/config"
 
 # Source config file if exists
 if [ -f $conf ]; then
@@ -35,12 +45,22 @@ fi
 
 # Dmenu command.
 dm="dmenu -i $DMENU_OPTIONS"
+if [ -n "$FONT" ]; then
+    dm="$dm -fn \"$FONT\""
+fi
 
 # Choose proper LSX binary.
 if which 'lsx-suckless' &> /dev/null; then
     lsx=lsx-suckless
 else
     lsx=lsx
+fi
+
+# Use gtk-launch for desktop files, if present.
+if which 'gtk-launch' &> /dev/null; then
+    gtklaunch=gtk-launch
+else
+    unset gtklaunch
 fi
 
 function get-open-windows {
@@ -55,12 +75,22 @@ function get-applications {
     # Create cache directory if it doesn't exist.
     mkdir -p "${cache%/*}"
     # Cache names and executable paths of XDG shortcuts.
-    for file in $(printf '%s/*.desktop\n' "${xdg_paths[@]}"); do
-        # Grab the friendly name and path of the executable.
-        # (Thanks, <geirha@freenode/#awk>.)
-        awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
-                   $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
-                   END { print name "|" exec }' "$file" 2> /dev/null
+    xdg_paths=$(echo "$XDG_DATA_DIRS:$XDG_DATA_HOME" | sed 's/:/ /g')
+    for path in $xdg_paths; do
+        for file in $(printf '%s/applications/*.desktop\n' "$path"); do
+            if [ -f "$file" ]; then
+                # Grab the friendly name and path of the executable.
+                # (Thanks, <geirha@freenode/#awk>.)
+                if [ -z "$gtklaunch" ]; then
+                    awk -F'=' '$1 == "Name" {sub(/Name=/, "", $0); name=$0}
+                               $1 == "Exec" {sub(/Exec=/, "", $0); exec=$0}
+                               END { print name "|" exec }' "$file" 2> /dev/null
+                else
+                    name=$(egrep ^Name= "$file" | head -n 1 | cut -d= -f2)
+                    echo "$name|$gtklaunch $(basename $file)"
+                fi
+            fi
+        done
     done > "$cache"
     # Start printing out the menu items, starting with XDG 
 	# shortcut names...
@@ -122,11 +152,7 @@ else
     apps=`cat "${cache}-menu"`
 fi
 wins="$(get-open-windows)"
-if [[ -z "$FONT" ]]; then
-	cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
-else 
-	cmd=$(echo -e "$wins\n$apps" | $dm -fn "$FONT" -p "!")
-fi
+cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
 
 # If nothing is selected -- exit
 [[ -z $cmd ]] && exit
