@@ -43,12 +43,6 @@ if [[ -z "$TERMCMD" ]]; then
 	TERMCMD="xterm -e"
 fi
 
-# Dmenu command.
-dm="dmenu -i $DMENU_OPTIONS"
-if [ -n "$FONT" ]; then
-    dm="$dm -fn \"$FONT\""
-fi
-
 # Choose proper LSX binary.
 if which 'lsx-suckless' &> /dev/null; then
     lsx=lsx-suckless
@@ -129,9 +123,16 @@ cmd-exists () {
     which "$1" &> /dev/null
 }
 
+dm-prompt() {
+    if [ -n "$FONT" ]; then
+        echo -e "$2" | dmenu -p "$1" -fn "${FONT}" -i ${DMENU_OPTIONS} 
+    else
+        echo -e "$2" | dmenu -p "$1" -i ${DMENU_OPTIONS} 
+    fi
+}
+
 launch () {
 	if [[ $1 == "1" ]]; then
-		echo "YAY: ${@:2}"
 		$TERMCMD "${@:2} && echo 'Press any key to close...' && read"
 	else
 		# Shouldn't be set when there won't be a terminal attached anymore...
@@ -152,7 +153,7 @@ else
     apps=`cat "${cache}-menu"`
 fi
 wins="$(get-open-windows)"
-cmd=$(echo -e "$wins\n$apps" | $dm -p "!")
+cmd=$(dm-prompt "!" "$wins\n$apps")
 
 # If nothing is selected -- exit
 [[ -z $cmd ]] && exit
@@ -172,7 +173,7 @@ if ! cmd-exists $cmd; then
 	cmd=$(grep -F "$cmd|" "$cache" | sed 's/.*|//;s/ %.//g')
     # If there's more than one, ask which binary to use.
     [[ "$(echo "$cmd" | wc -l)" != '1' ]] &&
-    cmd=$(echo "$cmd" | $dm -p 'Which one?')
+    cmd=$(dm-prompt "Which one?" "$cmd")
     [[ -z "$cmd" ]] && exit
 fi
 
